@@ -1,0 +1,105 @@
+/* Put your CSS here */
+.ember-application {
+}
+
+.hotriz-item {
+  vertical-align:middle;
+}
+
+html, body {
+  height: 100%;
+}
+
+#wrap {
+  min-height: 100%;
+}
+
+#main {
+  overflow:auto;
+  padding-bottom: 42px;
+}  /* must be same height as the footer */
+
+#footer {
+  position: relative;
+  margin-top: -42px; /* negative value of footer height */
+  height: 42px;
+  clear:both;
+  border-top: 1px solid #e5e5e5;
+  padding:10px;
+  text-align:center;
+} 
+
+/*Opera Fix*/
+body:before {
+  content:"";
+  height:100%;
+  float:left;
+  width:0;
+  margin-top:-32767px;
+}
+
+.lineone {
+  width:100%;
+}
+.linetwo {
+  max-width:100%;
+}
+
+.player {
+  width:100%;
+}
+.player-inner {
+  width:100%;
+  padding-top: 0px !important;
+  padding-bottom: 0px !important;
+}
+
+.hero {
+  width:258px;
+}
+
+.abilities {
+  margin:10px 25px;
+}
+
+.ability {
+  width:92px;
+  display:inline-block;
+  vertical-align:top;
+  border:1px solid #dcdcdc;
+  margin:5px;
+  position:relative;
+}
+
+.ability-cast {
+  width:90px;
+  height:90px;
+  position:absolute;
+  left:0;
+  top:0;
+  background:rgba(0, 0, 0, 0.5);
+  z-index:4;
+}
+
+.abilty-cooldown {
+  z-index:5;
+  position:absolute;
+  left: 35px;
+  top: 35px;
+  color: white;
+}
+
+.levels {
+  margin: 1px 3px;
+}
+.level {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  margin: 4px;
+  border: 2px solid;
+  border-radius: 10px;
+}
+.level-taken {
+  border: 5px solid;
+}
