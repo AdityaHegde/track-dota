@@ -1,6 +1,4 @@
-expensecalculator
+track-dota
 =================
 
-Expense Calculator in ember.js and nodejs/python backend.
-
-python - http://expense-calculator.appspot.com
+A UI to track stuff in dota 2
