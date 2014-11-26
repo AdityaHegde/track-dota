@@ -1,0 +1,9 @@
+default:
+  - 'concurrent:build'
+  - 'concurrent:move'
+  - 'concurrent:process'
+  - 'concurrent:clean'
+
+templates:
+  - 'emberTemplates'
+  - 'concat:templates'

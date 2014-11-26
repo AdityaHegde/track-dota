@@ -1,36 +1,59 @@
 {
-    "name": "dota-tracker",
-    "description" : "Dota Tracker",
-    "version": "1.0.0",
-    "author": "Aditya Hegde",
-    "main" : "/prod/nodejs/server.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository" : {
-      "type" : "git",
-      "url" : "https://github.com/AdityaHegde/dota-tracker"
-    },
-    "keywords" : [
-      "OpenShift",
-      "expense",
-      "calculator",
-      "nodejs",
-      "emberjs",
-      "bootstrap"
-    ],
-    "engines": {
-      "node": "0.10.x",
-      "npm" : ">= 1.0.0"
-    },
-    "dependencies": {
-      "mongodb" : "> 1.1.10" ,
-      "express" : ">3.0.0rc4"
-    },
-    "devDependencies": {},
-    "bundleDependencies": [],
-    "licence" : "MIT",
-    "bugs" : {
-      "url" : "https://github.com/AdityaHegde/dota-tracker/issues"
-    }
+  "name": "track-dota",
+  "description" : "Track Dota",
+  "version": "1.0.0",
+  "author": "Aditya Hegde",
+  "main" : "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/AdityaHegde/track-dota"
+  },
+  "keywords" : [
+    "nodejs",
+    "emberjs",
+    "bootstrap",
+    "passport",
+    "express",
+    "dota"
+  ],
+  "engines": {
+    "node": "0.10.x",
+    "npm" : ">= 1.0.0"
+  },
+  "dependencies": {
+    "mongodb" : "*",
+    "mongoose" : "*",
+    "express" : "*",
+    "body-parser" : "*",
+    "cookie-parser" : "*",
+    "express-session" : "*",
+    "method-override" : "*",
+    "passport" : "*",
+    "passport-google" : "*",
+    "passport-facebook" : "*",
+    "passport-twitter" : "*",
+    "grunt": "*",
+    "grunt-cli": "*",
+    "grunt-contrib-jshint": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-concat" : "*",
+    "grunt-ember-templates" : "*",
+    "grunt-contrib-yuidoc": "*",
+    "grunt-contrib-requirejs": "*",
+    "grunt-contrib-cssmin": "*",
+    "grunt-concurrent": "*",
+    "grunt-qunit-istanbul": "*",
+    "grunt-contrib-clean": "*",
+    "load-grunt-config": "*",
+    "time-grunt": "*"
+  },
+  "devDependencies": {},
+  "bundleDependencies": [],
+  "licence" : "MIT",
+  "bugs" : {
+    "url" : "https://github.com/AdityaHegde/expensecalculator/issues"
+  }
 }

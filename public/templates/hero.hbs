@@ -1,0 +1,8 @@
+<div class="hero center-block">
+  <img class="hero-img" {{bind-attr src=model.hero.img}}>
+  <div class="abilities">
+    {{#each model.abilityInstances}}
+      {{render "ability" this}}
+    {{/each}}
+  </div>
+</div>
