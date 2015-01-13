@@ -4469,7 +4469,7 @@ var ColumnDataChangeCollectorMixin = Ember.Mixin.create({
       }
       else {
         for(var i = 0; i < existingViews.length; i++) {
-          existingViews[i].colValueChanged(Ember.Object.create({name : listenColName, key : listenColName}), null, null);
+          existingViews[i].listenedColumnChanged(Ember.Object.create({name : listenColName, key : listenColName}), null, null);
         }
       }
     }
@@ -6043,6 +6043,15 @@ var allowedModelAttrs = [{
   value : "data/generic",
 }, {
   /**
+   * Custom end points map based on request types.
+   *
+   * @property customApiMap
+   * @type Object
+   * @static
+   */
+  attr : "customApiMap",
+}, {
+  /**
    * Keys needed to make delete calls. These values will be taken from either the record or 'CrudAdapter.GlobalData'
    *
    * @property deleteParams
@@ -6485,12 +6494,18 @@ var ApplicationAdapter = DS.RESTAdapter.extend({
     var 
     ty = (Ember.typeOf(type) == 'string' ? type : type.apiName || type.typeKey),
     model = (Ember.typeOf(type) == 'string' ? type : type),
-    url = APIConfig.API_BASE + "/" + ty;
-    if(APIConfig.APPEND_ID === 1 && APIConfig.APPEND_ID_MAP[requestType] === 1) {
-      url += "/" + getId(query, model);
+    url = "";
+    if(type.customApiMap) {
+      url = type.customApiMap[requestType];
     }
-    if(APIConfig.ENABLE_END_POINT === 1) {
-      url += "/" + APIConfig.END_POINT_MAP[requestType];
+    else {
+      url = APIConfig.API_BASE + "/" + ty;
+      if(APIConfig.APPEND_ID === 1 && APIConfig.APPEND_ID_MAP[requestType] === 1) {
+        url += "/" + getId(query, model);
+      }
+      if(APIConfig.ENABLE_END_POINT === 1) {
+        url += "/" + APIConfig.END_POINT_MAP[requestType];
+      }
     }
     return url;
   },
@@ -6517,7 +6532,8 @@ var ApplicationAdapter = DS.RESTAdapter.extend({
     return this.ajax(this.buildURL(type, query, "findAll"), APIConfig.HTTP_METHOD_MAP.find, { data : query });
   },
 
-  _findNext : function(store, type, query, id, queryType) {
+  //TODO revisit this
+  /*_findNext : function(store, type, query, id, queryType) {
     var adapter = store.adapterFor(type),
         serializer = store.serializerFor(type),
         label = "DS: Handle Adapter#find of " + type.typeKey;
@@ -6551,6 +6567,7 @@ var ApplicationAdapter = DS.RESTAdapter.extend({
     backupData(record, type);
     return this._findNext(record.store, type, query, getId(record, type), "getNext");
   },
+  */
 
   updateRecord : function(store, type, record) {
     var
@@ -6733,12 +6750,14 @@ var ApplicationSerializer = DS.RESTSerializer.extend({
     return this._super(store, type, payload, id, requestType);
   },
 
+  /* TODO : revisit this
   extractFindNext : function(store, type, payload) {
     var id = getId(payload.result.data, type);
     payload.result.data[type.paginatedAttribute].replace(0, 0, backupDataMap[type.typeKey][id][type.paginatedAttribute]);
     delete backupDataMap[type.typeKey][id];
     return this.extractSingle(store, type, payload);
   },
+  */
 
   extractDeleteRecord : function(store, type, payload) {
     if(payload.result.status == 1) throw new Ember.Error(payload.result.message);
@@ -6823,6 +6842,46 @@ var createRecordWrapper = function(store, type, data) {
 
 return {
   createRecordWrapper : createRecordWrapper,
+};
+
+});
+
+define('crud-adapter/findRecordWrapper',[
+  "ember",
+  "ember_data",
+], function(Ember, DS) {
+
+/**
+ * Wrapper to find record(s).
+ *
+ * @method findRecordWrapper
+ * @for CrudAdapter
+ * @param {Instance} store
+ * @param {Class|String} type
+ * @param {Object} [query]
+ */
+
+function recordReady(data) {
+  if(data.forEach) {
+    data.forEach(function(rec) {
+      recordReady(rec);
+    });
+  }
+  if(data.recordReady) {
+    data.recordReady();
+  }
+}
+
+var findRecordWrapper = function(store, type, query) {
+  var promise = store.find(type, query);
+  promise.then(function(data) {
+    recordReady(data);
+  });
+  return promise;
+};
+
+return {
+  findRecordWrapper : findRecordWrapper,
 };
 
 });
@@ -7023,8 +7082,10 @@ define('crud-adapter/forceReload',[
   "ember",
   "ember_data",
   "./backupData",
-], function(Ember, DS, backupData) {
+  "./findRecordWrapper",
+], function(Ember, DS, backupData, findRecordWrapper) {
 backupData = backupData.backupData;
+findRecordWrapper = findRecordWrapper.findRecordWrapper;
 
 /**
  * Method to reload a record.
@@ -7043,7 +7104,7 @@ var forceReload = function(store, type, id) {
     return record.reload();
   }
   else {
-    return store.find(type, id);
+    return findRecordWrapper(store, type, id);
   }
 };
 
@@ -7160,7 +7221,7 @@ var DelayedAddToHasManyMixin = Ember.Mixin.create(Utils.ObjectWithArrayMixin, {
         propArray.pushObject(propObj);
       }
     }
-    else {
+    else if(arrayPropDelayedObjs) {
       arrayPropDelayedObjs[prop] = arrayPropDelayedObjs[prop] || [];
       if(!arrayPropDelayedObjs[prop].contains(propObj)) {
         arrayPropDelayedObjs[prop].push(propObj);
@@ -7181,7 +7242,7 @@ var DelayedAddToHasManyMixin = Ember.Mixin.create(Utils.ObjectWithArrayMixin, {
 
   addToContent : function(prop) {
     var arrayPropDelayedObjs = this.get("arrayPropDelayedObjs"), propArray = this.get(prop);
-    if(propArray && propArray.get("canAddObjects") && arrayPropDelayedObjs[prop]) {
+    if(propArray && propArray.get("canAddObjects") && arrayPropDelayedObjs && arrayPropDelayedObjs[prop]) {
       arrayPropDelayedObjs[prop].forEach(function(propObj) {
         if(!propArray.contains(propObj)) {
           propArray.pushObject(propObj);
@@ -7237,6 +7298,7 @@ define('crud-adapter/main',[
   "./applicationAdapter",
   "./applicationSerializer",
   "./createRecordWrapper",
+  "./findRecordWrapper",
   "./saveRecord",
   "./backupData",
   "./retrieveBackup",
@@ -10432,8 +10494,9 @@ var mulid = 0;
 var MultiEntryView = TextInputView.TextInputView.extend(ColumnData.ColumnDataChangeCollectorMixin, {
   childView : function() {
     var columnData = this.get("columnData");
-    return Form.TypeToCellNameMap[columnData.get("childCol").type];
-  }.property("view.columnData.childCol.type"),
+    return Form.TypeToCellNameMap[columnData.get("childCol.form.moduleType")];
+  }.property("view.columnData.childCol.form.moduleType"),
+
   template : Ember.Handlebars.compile('' +
     '<div {{bind-attr class="view.columnData.form.multiEntryContainerClass"}}>' +
     '{{#with view as outerView}}' +
@@ -10460,8 +10523,8 @@ var MultiEntryView = TextInputView.TextInputView.extend(ColumnData.ColumnDataCha
       '{{/each}}'+
     '{{/with}}' +
     '</div>'+
-    '<p class="tp-rules-end-msg">{{view.columnData.form.postInputText}}</p>'
-    ),
+    '<p class="tp-rules-end-msg">{{view.columnData.form.postInputText}}</p>' +
+  ''),
 
   valuesArrayDidChange : function() {
     if(this.get("record")) this.validateValue(this.get("value"));
@@ -10522,7 +10585,7 @@ var MultiInputView = Ember.View.extend(MultiColumnMixin.MultiColumnMixin, Column
     }
   }.property(),
 
-  columnDataGroup : Ember.computed.alias("columnData.childColumnDataGroup"),
+  columnDataGroup : Ember.computed.alias("columnData.childColGroup"),
 });
 
 return {
@@ -11097,7 +11160,7 @@ var GroupRadioButtonView = TextInputView.TextInputView.extend({
   template : Ember.Handlebars.compile('' +
     '{{#each view.columnData.form.options}}' +
       '<div {{bind-attr class="radio view.columnData.form.displayInline:radio-inline"}}>' +
-        '<label>{{view "form/radioInput" name=view.groupName value=this.value selection=view.value}}<span></span>{{{this.label}}}</label>' +
+        '<label>{{view "form/radioInput" name=view.groupName value=this.val selection=view.value}}<span></span>{{{this.label}}}</label>' +
       '</div>' +
     '{{/each}}' +
   ''),
@@ -11152,8 +11215,15 @@ define('form/form-items/groupCheckBoxView',[
  * @submodule form-items
  */
 var GroupCheckBoxView = TextInputView.TextInputView.extend({
-  template : Ember.Handlebars.compile('{{#each view.newCheckList}}<div {{bind-attr class="checkbox col-md-4 view.columnData.form.displayInline:checkbox-inline"}}>'
-    + '<label>{{view "checkbox" checked=this.checked disabled=view.isDisabled}}<label></label> {{this.checkboxLabel}}</label></div>{{/each}}'),
+  template : Ember.Handlebars.compile('' +
+    '{{#each view.newCheckList}}' +
+      '<div {{bind-attr class=":checkbox view.columnData.form.checkBoxClass view.columnData.form.displayInline:checkbox-inline"}}>' +
+        '<label>' +
+          '{{view "checkbox" checked=this.checked disabled=view.isDisabled}} {{this.checkboxLabel}}' +
+        '</label>' +
+      '</div>' +
+    '{{/each}}' +
+  ''),
 
   checkBoxDidChange : function (){
     var checkList = this.get("newCheckList");
@@ -11162,7 +11232,8 @@ var GroupCheckBoxView = TextInputView.TextInputView.extend({
 
   newCheckList : function() {
     var ncl = Ember.A(), ocl = this.get("columnData.form.checkList"),
-        list = this.get("record").get(this.get("columnData").name).split(",");
+        val = this.get("record").get(this.get("columnData.key"))
+        list = (val && val.split(",")) || [];
     for(var i = 0; i < ocl.get("length") ; i++) {
       var op = JSON.parse(JSON.stringify(ocl[i], ["checkboxLabel", "id"]));
       if(list.indexOf(op.id+"") == -1) {
@@ -12538,12 +12609,36 @@ return Tooltip;
 
 });
 
+define('misc/baseController',[
+  "ember",
+  "../column-data/main",
+], function(Ember, ColumnData) {
+
+var BaseController = Ember.Controller.extend({
+  init : function() {
+    this._super();
+    this.set("columnDataGroup", ColumnData.Registry.retrieve(this.get("columnDataGroupName"), "columnDataGroup"));
+  },
+
+  columnDataGroup : null,
+  columnDataGroupName : "",
+});
+
+window.BaseController = {
+  BaseController : BaseController,
+};
+
+return BaseController;
+
+});
+
 define('misc/main',[
   "./alerts",
   "./app-wrapper",
   "./popover",
   "./progress-bars",
   "./tooltips",
+  "./baseController",
 ], function() {
 });
 

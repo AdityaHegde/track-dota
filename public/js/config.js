@@ -10,6 +10,7 @@ var require = {
     jquery_mockjax     : "lib/jquery.mockjax",
     "ember-utils"      : "lib/ember-utils",
     "ember-utils-core" : "lib/ember-utils-core",
+    "socket.io"        : "lib/socket.io",
   },
   shim : {
     jquery_mockjax : ["jquery"],
@@ -28,6 +29,9 @@ var require = {
       exports : "Utils",
     },
     "ember-utils" : ["ember_data", "bootstrap", "ember-utils-core"],
+    "socket.io" : {
+      exports : "io",
+    },
   },
   waitSeconds : 10,
 };

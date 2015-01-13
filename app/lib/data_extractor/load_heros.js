@@ -3,7 +3,7 @@ hero_list = require("./hero_list"),
 mongodb_data_adaptor = require("../mongodb_data_adaptor");
 
 mongodb_data_adaptor.init({
-  "hero" : "./models/hero",
+  "hero" : "../models/hero",
 });
 
 hero_list(function(err, heros) {

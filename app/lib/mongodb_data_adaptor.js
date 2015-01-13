@@ -43,8 +43,8 @@ exports.init = function(entities) {
 exports.create = function(modelName, jsonData, callback, fetchFull) {
   var model = modelMap[modelName],
       obj = new model(jsonData);
-  //console.log("Create "+modelName);
-  //console.log(jsonData);
+  console.log("Create "+modelName);
+  console.log(jsonData);
   obj.save(function(err, obj) {
     if(err) {
       callback(err);

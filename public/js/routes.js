@@ -10,6 +10,31 @@ Dota.IndexRoute = Ember.Route.extend({
 
   afterModel : function(model) {
     Ember.set("CrudAdapter.GlobalData.heros", model);
+    var meta = this.store.metadataFor("hero");
+    if(meta.user) {
+      model.set("profile", CrudAdapter.createRecordWrapper(this.store, "profile", meta.user));
+    }
+  },
+});
+
+Dota.LoginRoute = Ember.Route.extend({
+  model : function(params, transtion) {
+    return CrudAdapter.createRecordWrapper(this.store, "profile", {});
+  },
+});
+
+Dota.SignupRoute = Ember.Route.extend({
+  model : function(params, transtion) {
+    return CrudAdapter.createRecordWrapper(this.store, "profile", {});
+  },
+});
+
+Dota.ChatRoute = Ember.Route.extend({
+  model : function(params, transtion) {
+    if(!Ember.get("CrudAdapter.GlobalData.heros.profile")) {
+      this.transitionTo("login");
+    }
+    return [];
   },
 });
 

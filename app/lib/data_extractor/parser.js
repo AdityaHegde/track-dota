@@ -2,7 +2,7 @@ var
 http = require('http'),
 jsdom = require("jsdom"),
 fs = require("fs"),
-jquery = fs.readFileSync("../../public/js/lib/jquery-2.1.1.js", "utf-8");
+jquery = fs.readFileSync("../../../public/js/lib/jquery-2.1.1.js", "utf-8");
 
 module.exports = function(options, callback) {
   jsdom.env({

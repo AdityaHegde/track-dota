@@ -1,11 +1,13 @@
 define([
+  "socket.io",
   "ember-utils",
   "./app",
   "./column-data",
-  "./controllers",
+  "./controllers/main",
   "./objects",
   "./routes",
   "./templates",
   "./views",
-], function() {
+], function(io) {
+  window.io = io;
 });

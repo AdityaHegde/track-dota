@@ -57,7 +57,7 @@ module.exports = function(options, callback) {
           ability.isPassive = true;
         }
 
-        if(i === data.length - 1) {
+        if(i === abilitiesDivs.length - 1) {
           ability.isUlti = true;
         }
 

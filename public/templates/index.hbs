@@ -12,8 +12,13 @@
     <ul class="nav navbar-nav">
       <li id="people-link">{{#link-to 'index'}}Home{{/link-to}}</li>
       <li id="people-link">{{#link-to 'game'}}Game{{/link-to}}</li>
+      <li id="people-link">{{#link-to 'chat'}}Chat{{/link-to}}</li>
     </ul>
-    <p class="navbar-text navbar-right">Signed in as {{model.userName}}</p>
+    {{#if model.profile}}
+      <p class="navbar-text navbar-right">Signed in as {{model.profile.displayName}}, <a href="/logout">Logout</a></p>
+    {{else}}
+      <p class="navbar-text navbar-right">{{#link-to 'login'}}Login{{/link-to}}</p>
+    {{/if}}
   </div>
 </nav>
 <div class="container">

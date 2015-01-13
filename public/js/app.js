@@ -11,6 +11,9 @@ Dota.Router.map(function() {
   this.resource('index', { path : '' }, function() {
     this.resource('game', { path : 'game' }, function() {
     });
+    this.resource('login',  { path : 'login'});
+    this.resource('signup', { path : 'signup'});
+    this.resource('chat', { path : 'chat'});
   });
 });
 

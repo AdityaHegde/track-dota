@@ -26,13 +26,17 @@ function handleRequest(req, res, params, method, methodAlternate) {
   model = requestParams[0],
   query = requestParams[1],
   lastModelHasId = requestParams[2],
-  methodToUse = lastModelHasId === 1 ? method : methodAlternate;
+  methodToUse = lastModelHasId === 1 ? method : methodAlternate,
+  meta = {};
   mongodb_data_adaptor[methodToUse](model, query, function(err, data) {
     if(err) {
       res.send(utils.retError(err));
     }
     else {
-      res.send(utils.retResult(data));
+      if(req.user) {
+        meta.user = req.user;
+      }
+      res.send(utils.retResult(data, meta));
     }
   });
 }
