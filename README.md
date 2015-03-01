@@ -1,4 +1,6 @@
-track-dota
+dota2-score-feed
 =================
 
-A UI to track stuff in dota 2
+An app to get dota2 score feed of tournament games.
+
+WIP

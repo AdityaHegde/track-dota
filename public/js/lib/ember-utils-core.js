@@ -450,32 +450,52 @@ define('hasMany',[
  * then the 'modelClassKey' in the object is used as a key in 'modelClass' the object to get the class.
  * 'defaultKey' the 3rd parameter is used as a default if object[modelClassKey] is not present.
  *
+ * Can pass a 4th argument. A registry of objects. If the object (identified by an idKey) is already present, reference to the object is returned.
+ * 5th argument is the idKey
+ *
  * @method hasMany
  * @for Utils
  * @static
  * @param {Class|Object} modelClass
  * @param {String} [modelClassKey]
  * @param {String} [defaultKey]
+ * @param {Object} [registry]
+ * @param {String} [idKey]
  * @returns {Instance}
  */
-function hasMany(modelClass, modelClassKey, defaultKey) {
+function hasMany(modelClass, modelClassKey, defaultKey, registry, idKey) {
   modelClass = modelClass || Ember.Object;
-  var hasInheritance = Ember.typeOf(modelClass) !== "class";
+  var
+  hasInheritance = Ember.typeOf(modelClass) !== "class",
+  hasRegistry = registry && idKey;
 
   return Ember.computed(function(key, newval) {
     if(Ember.typeOf(modelClass) === 'string') {
       modelClass = Ember.get(modelClass);
       hasInheritance = Ember.typeOf(modelClass) !== "class";
     }
+    if(Ember.typeOf(registry) === 'string') {
+      registry = Ember.get(registry);
+      hasRegistry = registry && idKey;
+    }
     if(arguments.length > 1) {
       if(newval && newval.length) {
         newval.beginPropertyChanges();
         for(var i = 0; i < newval.length; i++) {
-          var obj = newval[i], classObj = modelClass;
-          if(hasInheritance) classObj = modelClass[Ember.isEmpty(obj[modelClassKey]) ? defaultKey : obj[modelClassKey]];
-          if(!(obj instanceof classObj)) {
-            obj = classObj.create(obj);
-            obj.set("parentObj", this);
+          var
+          obj = newval[i], classObj = modelClass;
+          if(hasRegistry && registry[obj[idKey]]) {
+            obj = registry[obj[idKey]];
+          }
+          else {
+            if(hasInheritance) classObj = modelClass[Ember.isEmpty(obj[modelClassKey]) ? defaultKey : obj[modelClassKey]];
+            if(!(obj instanceof classObj)) {
+              obj = classObj.create(obj);
+              obj.set("parentObj", this);
+            }
+            if(hasRegistry) {
+              registry[obj[idKey]] = obj;
+            }
           }
           newval.splice(i, 1, obj);
         }
@@ -507,6 +527,9 @@ define('belongsTo',[
  * Optionally can create the instance with mixin. A single mixin can be passed or a map of mixins as 4th parameter with key extracted from object using mixinKey (5th parameter) can be passed.
  * 'defaultMixin' (6th parameter) is used when object[mixinKey] is not present.
  *
+ * Can pass a 7th argument. A registry of objects. If the object (identified by an idKey) is already present, reference to the object is returned.
+ * 8th argument is the idKey
+ *
  * @method belongsTo
  * @for Utils
  * @static
@@ -516,13 +539,17 @@ define('belongsTo',[
  * @param {Mixin|Object} [mixin]
  * @param {String} [mixinKey]
  * @param {String} [defaultMixin]
+ * @param {Object} [registry]
+ * @param {String} [idKey]
  * @returns {Instance}
  */
-function belongsTo(modelClass, modelClassKey, defaultKey, mixin, mixinKey, defaultMixin) {
+function belongsTo(modelClass, modelClassKey, defaultKey, mixin, mixinKey, defaultMixin, registry, idKey) {
   modelClass = modelClass || Ember.Object;
-  var hasInheritance = Ember.typeOf(modelClass) !== "class",
-      hasMixin = mixin instanceof Ember.Mixin,
-      hasMixinInheritance = !hasMixin && Ember.typeOf(mixin) === "object";
+  var
+  hasInheritance = Ember.typeOf(modelClass) !== "class",
+  hasMixin = mixin instanceof Ember.Mixin,
+  hasMixinInheritance = !hasMixin && Ember.typeOf(mixin) === "object",
+  hasRegistry = registry && idKey;
   return Ember.computed(function(key, newval) {
     if(Ember.typeOf(modelClass) === 'string') {
       modelClass = Ember.get(modelClass);
@@ -533,21 +560,30 @@ function belongsTo(modelClass, modelClassKey, defaultKey, mixin, mixinKey, defau
       hasMixin = mixin instanceof Ember.Mixin;
       hasMixinInheritance = !hasMixin && Ember.typeOf(mixin) === "object";
     }
+    if(Ember.typeOf(registry) === 'string') {
+      registry = Ember.get(registry);
+      hasRegistry = registry && idKey;
+    }
     if(arguments.length > 1) {
       if(newval) {
         var classObj = modelClass;
-        if(hasInheritance) classObj = modelClass[Ember.isEmpty(newval[modelClassKey]) ? defaultKey : newval[modelClassKey]];
-        if(!(newval instanceof classObj)) {
-          if(hasMixin) {
-            newval = classObj.createWithMixins(mixin, newval);
+        if(hasRegistry && registry[newval[idKey]]) {
+          newval = registry[newval[idKey]];
+        }
+        else {
+          if(hasInheritance) classObj = modelClass[Ember.isEmpty(newval[modelClassKey]) ? defaultKey : newval[modelClassKey]];
+          if(!(newval instanceof classObj)) {
+            if(hasMixin) {
+              newval = classObj.createWithMixins(mixin, newval);
+            }
+            else if(hasMixinInheritance) {
+              newval = classObj.createWithMixins(mixin[newval[mixinKey] || defaultMixin], newval);
+            }
+            else {
+              newval = classObj.create(newval);
+            }
+            newval.set("parentObj", this);
           }
-          else if(hasMixinInheritance) {
-            newval = classObj.createWithMixins(mixin[newval[mixinKey] || defaultMixin], newval);
-          }
-          else {
-            newval = classObj.create(newval);
-          }
-          newval.set("parentObj", this);
         }
       }
       return newval;
@@ -894,130 +930,14 @@ return {
 
 });
 
-define('delayedAddToHasManyMixin',[
-  "ember",
-  "./objectWithArrayMixin",
-], function(objectWithArrayMixin) {
-
-
-/**
- * A mixin to add observers to array properties. Used in belongsTo of a ember-data model.
- * Adds after the HasMany object is resolved.
- *
- * @class Utils.DelayedAddToHasManyMixin
- * @extends Utils.ObjectWithArrayMixin
- * @static
- */
-var delayAddId = 0;
-var DelayedAddToHasManyMixin = Ember.Mixin.create(objectWithArrayMixin, {
-  init : function() {
-    this._super();
-    Ember.set(this, "arrayPropDelayedObjs", {});
-  },
-
-  arrayPropDelayedObjs : null,
-
-  addDelayObserverToProp : function(propKey, method) {
-    method = method || "propWasUpdated";
-    Ember.addObserver(this, propKey, this, method);
-  },
-
-  removeDelayObserverFromProp : function(propKey) {
-    method = method || "propWasUpdated";
-    Ember.removeObserver(this, propKey, this, method);
-  },
-
-  propArrayNotifyChange : function(prop, key) {
-    if(prop && prop.then) {
-      prop.set("canAddObjects", false);
-      prop.then(function() {
-        prop.set("canAddObjects", true);
-      });
-    }
-    else {
-      for(var i = 0; i < prop.get("length"); i++) {
-        this[key+"WasAdded"](prop.objectAt(i), i, true);
-      }
-    }
-  },
-
-  /**
-   * Method to add a property after the array prop loads.
-   *
-   * @property addToProp
-   * @param {String} prop Property of array to add to.
-   * @param {Instance} propObj Object to add to array.
-   */
-  addToProp : function(prop, propObj) {
-    var arrayPropDelayedObjs = this.get("arrayPropDelayedObjs"), propArray = this.get(prop);
-    if(propArray && propArray.get("canAddObjects")) {
-      if(!propArray.contains(propObj)) {
-        propArray.pushObject(propObj);
-      }
-    }
-    else {
-      arrayPropDelayedObjs[prop] = arrayPropDelayedObjs[prop] || [];
-      if(!arrayPropDelayedObjs[prop].contains(propObj)) {
-        arrayPropDelayedObjs[prop].push(propObj);
-      }
-    }
-  },
-
-  hasArrayProp : function(prop, findKey, findVal) {
-    var arrayPropDelayedObjs = this.get("arrayPropDelayedObjs"), propArray = this.get(prop);
-    if(propArray.get("canAddObjects")) {
-      return !!propArray.findBy(findKey, findVal);
-    }
-    else if(arrayPropDelayedObjs && arrayPropDelayedObjs[prop]) {
-      return !!arrayPropDelayedObjs[prop].findBy(findKey, findVal);
-    }
-    return false;
-  },
-
-  addToContent : function(prop) {
-    var arrayPropDelayedObjs = this.get("arrayPropDelayedObjs"), propArray = this.get(prop);
-    if(propArray && propArray.get("canAddObjects") && arrayPropDelayedObjs[prop]) {
-      arrayPropDelayedObjs[prop].forEach(function(propObj) {
-        if(!propArray.contains(propObj)) {
-          propArray.pushObject(propObj);
-        }
-      }, propArray);
-      delete arrayPropDelayedObjs[prop];
-    }
-  },
-
-  arrayProps : null,
-  arrayPropsWillBeDeleted : function(arrayProp) {
-    this._super(arrayProp);
-    this.removeDelayObserverFromProp(arrayProp+".canAddObjects");
-    this.removeDelayObserverFromProp(arrayProp);
-  },
-  arrayPropWasAdded : function(arrayProp) {
-    this._super(arrayProp);
-    var prop = this.get(arrayProp), that = this;
-    if(!this["addTo_"+arrayProp]) this["addTo_"+arrayProp] = function(propObj) {
-      that.addToProp(arrayProp, propObj);
-    };
-    this.addDelayObserverToProp(arrayProp, function(obj, key) {
-      that.addToContent(arrayProp);
-    });
-    this.addDelayObserverToProp(arrayProp+".canAddObjects", function(obj, key) {
-      that.addToContent(arrayProp);
-    });
-  },
-
-});
-
-
-return {
-  DelayedAddToHasManyMixin : DelayedAddToHasManyMixin,
-};
-
-});
-
 define('misc',[
   "ember",
 ], function() {
+
+var
+typeOf = function(obj) {
+  return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase();
+};
 
 /**
  * Search in a multi level array.
@@ -1090,13 +1010,31 @@ function binaryInsert(a, e, c) {
  * @returns {Object} Returns the target object.
  */
 function merge(tar, src, replace) {
-  for(var k in src) {
-    if(!src.hasOwnProperty(k) || !Ember.isNone(tar[k])) {
-      continue;
+  if(Ember.isNone(tar)) {
+    return src;
+  }
+  if(typeOf(src) === "object") {
+    for(var k in src) {
+      if(!src.hasOwnProperty(k) || !Ember.isNone(tar[k])) {
+        continue;
+      }
+      if(Ember.isNone(tar[k]) || replace) {
+        tar[k] = merge(tar[k], src[k], replace);
+      }
     }
-    if(Ember.isEmpty(tar[k]) || replace) {
-      tar[k] = src[k];
+  }
+  else if(typeOf(src) === "array") {
+    if(src.length === tar.length) {
+      for(var i = 0; i < src.length; i++) {
+        tar[i] = merge(tar[i], src[i], replace);
+      }
     }
+    else {
+      return src;
+    }
+  }
+  else {
+    return src;
   }
   return tar;
 };
@@ -1208,7 +1146,6 @@ define('ember-utils-core',[
   "./hasMany",
   "./belongsTo",
   "./hierarchy",
-  "./delayedAddToHasManyMixin",
   "./objectWithArrayMixin",
   //"./hashMapArray",
   "./misc",

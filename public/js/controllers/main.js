@@ -6,6 +6,6 @@ define([
   "./loginController",
   "./signupController",
   "./playerController",
-  "./chatController",
+  "./playerStatsController",
 ], function() {
 });

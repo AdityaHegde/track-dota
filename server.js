@@ -35,4 +35,7 @@ require('./app/routes.js')(app, passport);
 
 var socketIO = io.listen(app.listen(config.server.port, config.server.ip));
 
-sockets(socketIO);
+sockets.connection(socketIO);
+sockets.collectGameDataAndSend(socketIO);
+
+app.socketIO = socketIO;

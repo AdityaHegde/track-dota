@@ -1,7 +1,9 @@
 var
 dataHandler = require("./lib/data_handler"),
 express = require("express"),
-utils = require("./lib/utils");
+dota_data = require("./dota_data"),
+utils = require("./lib/utils"),
+sockets = require("./sockets");
 
 module.exports = function(app, passport) {
 
@@ -35,10 +37,16 @@ module.exports = function(app, passport) {
     return next();
   }
 
-  app.get(/^\/data\/v1\/api\/.*$/, ensureAuthentication, dataHandler.get);
-  app.post(/^\/data\/v1\/api\/.*$/, ensureAuthentication, dataHandler.create);
-  app.put(/^\/data\/v1\/api\/.*$/, ensureAuthentication, dataHandler.update);
-  app.delete(/^\/data\/v1\/api\/.*$/, ensureAuthentication, dataHandler.delete);
+  //app.get(/^\/data\/v1\/api\/.*$/, ensureAuthentication, dataHandler.get);
+  //app.post(/^\/data\/v1\/api\/.*$/, ensureAuthentication, dataHandler.create);
+  //app.put(/^\/data\/v1\/api\/.*$/, ensureAuthentication, dataHandler.update);
+  //app.delete(/^\/data\/v1\/api\/.*$/, ensureAuthentication, dataHandler.delete);
+
+  app.get("/dotadata/getTeamAndPlayerInfo", /*ensureAuthentication,*/ dota_data.handleTeamAndPlayerDataRequest);
+  app.get("/dotadata/getStaticData", /*ensureAuthentication,*/ dota_data.handleGameStaticDataRequest);
+  app.get("/dotadata/getCurrentMatches", /*ensureAuthentication,*/ function(req, res) {
+    res.send(utils.retResult(sockets.getRunningMatches()));
+  });
 
   app.use("/", express.static('./public'));
 

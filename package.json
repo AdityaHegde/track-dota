@@ -1,6 +1,6 @@
 {
-  "name": "track-dota",
-  "description" : "Track Dota",
+  "name": "dota2-score-feed",
+  "description" : "Dota2 Score Feed",
   "version": "1.0.0",
   "author": "Aditya Hegde",
   "main" : "server.js",
@@ -54,12 +54,15 @@
     "grunt-qunit-istanbul": "*",
     "grunt-contrib-clean": "*",
     "load-grunt-config": "*",
-    "time-grunt": "*"
+    "dota": "*",
+    "time-grunt": "*",
+    "deep-keys-lib": "*",
+    "promise2" : "*"
   },
   "devDependencies": {},
   "bundleDependencies": [],
   "licence" : "MIT",
   "bugs" : {
-    "url" : "https://github.com/AdityaHegde/expensecalculator/issues"
+    "url" : "https://github.com/AdityaHegde/track-dota/issues"
   }
 }

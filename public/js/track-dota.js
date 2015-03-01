@@ -4,10 +4,10 @@ define([
   "./app",
   "./column-data",
   "./controllers/main",
-  "./objects",
+  "./objects/main",
   "./routes",
   "./templates",
-  "./views",
+  "./views/main",
 ], function(io) {
   window.io = io;
 });

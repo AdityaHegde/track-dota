@@ -1,0 +1,8 @@
+<div class="player">
+  <div class="well player-inner">
+    <h4>{{model.name}}
+    {{view "select" content=CrudAdapter.GlobalData.heros optionValuePath="content.id" optionLabelPath="content.name" prompt="Select" value=selectedHero}}
+    </h4>
+    {{render "hero" model.heroInstance}}
+  </div>
+</div>

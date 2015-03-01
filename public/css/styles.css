@@ -38,68 +38,42 @@ body:before {
   margin-top:-32767px;
 }
 
-.lineone {
-  width:100%;
+.game-map {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+  height: 600px;
+  width: 600px;
+  background-image: url("/images/minimap_600x600.png");
 }
-.linetwo {
-  max-width:100%;
+.game-stats {
+  display: inline-block;
+  vertical-align: top;
+  width: calc(100% - 600px);
+}
+.game-time {
+  text-align:center;
+}
+.team-banner {
+  text-align:center;
 }
 
 .player {
-  width:100%;
+  position: absolute;
+  width: 20px;
+  height: 20px;
 }
-.player-inner {
-  width:100%;
-  padding-top: 0px !important;
-  padding-bottom: 0px !important;
+.player-radiant {
+  color: blue;
+}
+.player-dire {
+  color: red;
 }
 
 .hero {
-  width:258px;
-}
-
-.abilities {
-  margin:10px 25px;
-}
-
-.ability {
-  width:92px;
   display:inline-block;
-  vertical-align:top;
-  border:1px solid #dcdcdc;
-  margin:5px;
-  position:relative;
+  width:20%;
 }
-
-.ability-cast {
-  width:90px;
-  height:90px;
-  position:absolute;
-  left:0;
-  top:0;
-  background:rgba(0, 0, 0, 0.5);
-  z-index:4;
-}
-
-.abilty-cooldown {
-  z-index:5;
-  position:absolute;
-  left: 35px;
-  top: 35px;
-  color: white;
-}
-
-.levels {
-  margin: 1px 3px;
-}
-.level {
-  width: 10px;
-  height: 10px;
-  display: inline-block;
-  margin: 4px;
-  border: 2px solid;
-  border-radius: 10px;
-}
-.level-taken {
-  border: 5px solid;
+.hero-minimap-icon {
+  padding: 15px;
 }

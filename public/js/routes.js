@@ -5,14 +5,33 @@ define([
 
 Dota.IndexRoute = Ember.Route.extend({
   model : function(params, transtion) {
-    return this.store.findAll("hero");
+    return new Ember.RSVP.Promise(function(resolve, reject) {
+      $.ajax({
+        url : "/dotadata/getStaticData",
+        dataType : "json",
+      }).then(function(data) {
+        Ember.run(function() {
+          resolve(data);
+        });
+      }, function(err) {
+        Ember.run(function() {
+          reject(err);
+        });
+      });
+    });
   },
 
   afterModel : function(model) {
-    Ember.set("CrudAdapter.GlobalData.heros", model);
-    var meta = this.store.metadataFor("hero");
-    if(meta.user) {
-      model.set("profile", CrudAdapter.createRecordWrapper(this.store, "profile", meta.user));
+    var dataTypes = {
+      heroes : Dota.HeroObject,
+      items  : Dota.ItemObject,
+    };
+    for(var d in dataTypes) {
+      var darr = [];
+      for(var i = 0; i < model.result.data[d].length; i++) {
+        darr.pushObject(dataTypes[d].create(model.result.data[d][i]));
+      }
+      Ember.set("CrudAdapter.GlobalData." + d, darr);
     }
   },
 });
@@ -29,24 +48,9 @@ Dota.SignupRoute = Ember.Route.extend({
   },
 });
 
-Dota.ChatRoute = Ember.Route.extend({
-  model : function(params, transtion) {
-    if(!Ember.get("CrudAdapter.GlobalData.heros.profile")) {
-      this.transitionTo("login");
-    }
-    return [];
-  },
-});
-
 Dota.GameRoute = Ember.Route.extend({
   model : function(params, transtion) {
-    var game = CrudAdapter.createRecordWrapper(this.store, "game", {});
-    for(var i = 0; i < 5; i++) {
-      game.addToProp('players', CrudAdapter.createRecordWrapper(this.store, "player", {
-        name : "a"+i,
-      }));
-    }
-    return game;
+    return [];
   },
 });
 

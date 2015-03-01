@@ -1,0 +1,10 @@
+<div class="ability">
+  <img class="hero-img" {{bind-attr src=model.ability.imgLarge}} {{action "cast"}}>
+  {{#if model.cooling}}<div class="ability-cast"></div><div class="abilty-cooldown center-block">{{model.timeLeft}}</div>{{/if}}
+  <div class="levels">
+    <div {{bind-attr class=":level model.isLevel1:level-taken"}} {{action "takeLevel" 1}}></div>
+    <div {{bind-attr class=":level model.isLevel2:level-taken"}} {{action "takeLevel" 2}}></div>
+    <div {{bind-attr class=":level model.isLevel3:level-taken"}} {{action "takeLevel" 3}}></div>
+    {{#unless model.ability.isUlti}}<div {{bind-attr class=":level model.isLevel4:level-taken"}} {{action "takeLevel" 4}}></div>{{/unless}}
+  </div>
+</div>

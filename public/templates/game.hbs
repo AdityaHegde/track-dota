@@ -1,14 +1,8 @@
-<div class="lineone center-block clearfix">
-  {{#each lineone}}
-    <div class="col-md-4">
-      {{render "player" this}}
-    </div>
-  {{/each}}
+<div class="well">
+  {{#each currentMatches}}<span class="btn btn-link" {{action "fetchGameData" this}}>{{this}}</span>{{/each}}
 </div>
-<div class="linetwo center-block clearfix">
-  {{#each linetwo}}
-    <div class="col-md-6">
-      {{render "player" this}}
-    </div>
-  {{/each}}
-</div>
+{{#if hasGameData}}
+  {{view "gameHeader" gameSnapshot=curGameData}}
+  {{view "gameBody"   gameSnapshot=curGameData}}
+  {{view "gameFooter" gameSnapshot=curGameData}}
+{{/if}}
