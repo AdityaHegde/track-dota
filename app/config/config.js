@@ -7,7 +7,7 @@ module.exports = {
   dota2 : {
     apiKey : "A8AE3F6AEA4E4082DB4111651D0E9AE3",
   },
-  mongodb : {
+  db : {
     mongodb : process.env.OPENSHIFT_MONGODB_DB_URL || "mongodb://localhost/local",
   },
 };

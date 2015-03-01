@@ -1,9 +1,9 @@
 var
 mongoose = require('mongoose'),
 utils = require('./utils'),
-modelMap = {};
-mongoose.connect("mongodb://localhost/local");
-//mongoose.connect("mongodb://$OPENSHIFT_MONGODB_DB_HOST:$OPENSHIFT_MONGODB_DB_PORT/");
+modelMap = {},
+config = require("../config/config");
+mongoose.connect(config.db.mongodb);
 
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
