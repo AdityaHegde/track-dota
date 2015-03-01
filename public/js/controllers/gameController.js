@@ -110,8 +110,8 @@ Dota.GameController = ArrayMod.ArrayModController.extend({
     var socket = io.connect("/"), that = this;
     socket.on("data", function(data) {
       if(data.first) {
-        that.fetchCurrentTeams(data.result);
         that.set("gameFeed", []);
+        that.fetchCurrentTeams(data.result);
       }
       else {
         that.gameDataRecieved(data.result);
@@ -143,7 +143,6 @@ Dota.GameController = ArrayMod.ArrayModController.extend({
     model.pushObjects(gameDataObj.get("scoreboard.dire.players") || []);
 
     this.get("gameFeed").pushObjects(gameDataObj.get("curFeed"));
-    console.log(gameDataObj.get("curFeed"));
 
     this.set("curGameData", gameDataObj);
     this.set("hasGameData", true);

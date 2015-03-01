@@ -47,6 +47,7 @@ module.exports = function(app, passport) {
   app.get("/dotadata/getCurrentMatches", /*ensureAuthentication,*/ function(req, res) {
     res.send(utils.retResult(sockets.getRunningMatches()));
   });
+  app.get("/dotadata/loadStaticData", /*ensureAuthentication,*/ dota_data.loadStaticData);
 
   app.use("/", express.static('./public'));
 

@@ -54,9 +54,9 @@ module.exports = {
         res.send(utils.retResult());
       }
     };
-    getData.getData("hero", {apiKey : config.apiKey}, {}, callback);
-    getData.getData("hero", {apiKey : config.apiKey}, {}, callback);
-    getData.getData("hero", {apiKey : config.apiKey}, {}, callback);
-    getData.getData("hero", {apiKey : config.apiKey}, {}, callback);
+    getData.getData("hero", {apiKey : config.dota2.apiKey}, {}, callback);
+    getData.getData("hero", {apiKey : config.dota2.apiKey}, {}, callback);
+    getData.getData("hero", {apiKey : config.dota2.apiKey}, {}, callback);
+    getData.getData("hero", {apiKey : config.dota2.apiKey}, {}, callback);
   },
 };

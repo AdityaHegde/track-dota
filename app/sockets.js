@@ -29,7 +29,7 @@ module.exports = {
       incrementalMeta : fullData,
     },
     params = {
-      apiKey : config.config,
+      apiKey : config.dota2.apiKey,
     };
 
     setInterval(function() {
@@ -43,6 +43,7 @@ module.exports = {
             });
           }
           lastCollectedGames = _lastCollectedGames;
+          console.log("Collected matches : " + _lastCollectedGames.join(", "));
         }
       });
     }, 10000);
