@@ -22,7 +22,7 @@ KillDeathObject = Ember.Object.extend({
     gameSnapshot = this.get("parentObj.parentObj.parentObj");
     if(gameSnapshot) {
       var players = gameSnapshot.get("scoreboard." + teamKey[team] + ".players");
-      if(teamActual) {
+      if(players) {
         return players.findBy("hero_id", hero_id);
       }
     }
@@ -44,5 +44,11 @@ Dota.TeamFightObject = Dota.FeedObject.extend({
 
   data : Utils.belongsTo(DataObject),
 });
+
+
+return {
+  teamFight : Dota.TeamFightObject,
+};
+
 
 });

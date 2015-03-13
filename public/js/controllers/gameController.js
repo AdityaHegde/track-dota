@@ -142,7 +142,8 @@ Dota.GameController = ArrayMod.ArrayModController.extend({
     model.pushObjects(gameDataObj.get("scoreboard.radiant.players") || []);
     model.pushObjects(gameDataObj.get("scoreboard.dire.players") || []);
 
-    this.get("gameFeed").pushObjects(gameDataObj.get("curFeed"));
+    //this.get("gameFeed").pushObjects(gameDataObj.get("curFeed"));
+    console.log(nextFullData.curEvents);
 
     this.set("curGameData", gameDataObj);
     this.set("hasGameData", true);
@@ -175,6 +176,23 @@ Dota.GameController = ArrayMod.ArrayModController.extend({
       controller.gameDataRecieved(gameData);
     }
   },
+
+  grid : function() {
+    var
+    grid = [],
+    maxX = Dota.GameSizeData.MAP_SIZE_X / Dota.GameSizeData.GRID_SIZE_X,
+    maxY = Dota.GameSizeData.MAP_SIZE_Y / Dota.GameSizeData.GRID_SIZE_Y,
+    gridSizeX = Dota.GameSizeData.GRID_SIZE_X * Dota.GameSizeData.imageSizeX / Dota.GameSizeData.MAP_SIZE_X,
+    gridSizeY = Dota.GameSizeData.GRID_SIZE_Y * Dota.GameSizeData.imageSizeY / Dota.GameSizeData.MAP_SIZE_Y;
+    for(var i = 0; i < maxX; i++) {
+      var row = [];
+      for(var j = 0; j < maxY; j++) {
+        row.push(j);
+      }
+      grid.push(row);
+    }
+    return grid;
+  }.property(),
 });
 
 });

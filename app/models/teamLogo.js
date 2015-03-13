@@ -1,32 +1,22 @@
 var 
 mongoose = require("mongoose"),
-teamSchema = mongoose.Schema({
-  team_id      : Number,
-  team_name    : String,
-  team_tag     : String,
-  time_created : Number,
-  logo         : Number,
-  logo_sponsor : Number,
-  country_code : String,
+teamLogoSchema = mongoose.Schema({
+  filename : String,
+  url      : String,
 }),
-team = mongoose.model('Team', teamSchema);
+teamLogo = mongoose.model('TeamLogo', teamLogoSchema);
 
-team.searchAttr = ["team_id"];
-team.queryParam = ["team_id"];
-team.apiFeed = {
+teamLogo.searchAttr = ["filename"];
+teamLogo.queryParam = ["filename"];
+teamLogo.apiFeed = {
   host : "api.steampowered.com",
   path : "/ISteamRemoteStorage/GetUGCFileDetails/v1/?key=<apiKey>&appid=570&ugcid=<logo>",
-  resultBase : "result.teams",
+  resultBase : "result.data",
   resultKeysToData : {
-    team_id      : "team_id",
-    team_name    : "name",
-    team_tag     : "tag",
-    time_created : "time_created",
-    logo         : "logo",
-    logo_sponsor : "logo_sponsor",
-    country_code : "country_code",
+    filename : "filename",
+    url      : "url",
   },
   isStatic : true,
 };
 
-module.exports = team;
+module.exports = teamLogo;

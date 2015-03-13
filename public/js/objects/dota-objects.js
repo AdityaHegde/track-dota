@@ -56,6 +56,7 @@ Dota.ItemObject = Ember.Object.extend({
 
   itemIcon        : function() {
     var item_name = this.get("item_name");
+    item_name = item_name.replace("item_", "");
     return "http://cdn.dota2.com/apps/dota2/images/items/" + item_name + "_lg.png";
   }.property("item_name"),
 });

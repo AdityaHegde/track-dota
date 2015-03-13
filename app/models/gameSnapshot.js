@@ -42,9 +42,9 @@ teamScoreboardSchema = {
     ability_level : Number,
   }],
 },
-feedSchema = mongoose.Schema({
+eventSchema = mongoose.Schema({
   type : String,
-  data : {},
+  obj  : {},
 }),
 gameSnapshotSchema = mongoose.Schema({
   lobby_id : Number,
@@ -69,7 +69,7 @@ gameSnapshotSchema = mongoose.Schema({
   league_tier         : Number,
   spectators          : Number,
   stream_delay_s      : Number,
-  curFeed             : [feedSchema],
+  curEvents           : [eventSchema],
 }),
 gameSnapshot = mongoose.model('GameSnapshot', gameSnapshotSchema);
 
@@ -82,8 +82,9 @@ gameSnapshot.apiFeed = {
   useFullResult : true,
   incrementalBy : "match_id",
   ignoreKeysForDiff : {
-    curFeed : 1,
+    curEvents : 1,
   },
+  retainKeys : ["match_id", "curFeed"],
   processKeysOnRecord : {
     dire_team    : {
       type   : "getDataCreateIfNotPresent",
@@ -99,8 +100,8 @@ gameSnapshot.apiFeed = {
       key    : "_id",
       params : ["team_id"],
     },
-    curFeed      : {
-      type   : "extractFeed",
+    curEvents    : {
+      type   : "extractEvents",
       getKey : "",
       model  : "game",
       key    : "",

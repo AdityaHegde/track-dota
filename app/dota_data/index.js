@@ -47,16 +47,30 @@ module.exports = {
 
   loadStaticData : function(req, res) {
     var
-    sd = 0;
+    sd = 0,
+    heros,
+    abilities,
+    assignAbilitiesToHeros = function() {
+      if(heros && abilities) {
+      }
+    };
     callback = function() {
       sd++;
       if(sd === 4) {
         res.send(utils.retResult());
       }
     };
-    getData.getData("hero", {apiKey : config.dota2.apiKey}, {}, callback);
-    getData.getData("hero", {apiKey : config.dota2.apiKey}, {}, callback);
-    getData.getData("hero", {apiKey : config.dota2.apiKey}, {}, callback);
-    getData.getData("hero", {apiKey : config.dota2.apiKey}, {}, callback);
+    getData.getData("hero", {apiKey : config.dota2.apiKey}, {}, function(err, heroRecs) {
+      heros = heroRecs;
+      assignAbilitiesToHeros();
+      callback();
+    });
+    getData.getData("item", {apiKey : config.dota2.apiKey}, {}, callback);
+    getData.getData("ability", {apiKey : config.dota2.apiKey}, {}, function(err, abilityRecs) {
+      abilities = abilityRecs;
+      assignAbilitiesToHeros();
+      callback();
+    });
+    getData.getData("league", {apiKey : config.dota2.apiKey}, {}, callback);
   },
 };

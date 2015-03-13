@@ -6,7 +6,7 @@ define([
 Dota.GameFeedView = Ember.View.extend({
   template : Ember.Handlebars.compile('' +
     '{{#each controller.gameFeed}}' +
-      //'{{view type feed=this}}' +
+      '{{view type feed=this}}' +
     '{{/each}}' +
   ''),
 

@@ -7,3 +7,6 @@ default:
 templates:
   - 'emberTemplates'
   - 'concat:templates'
+
+test_nodejs:
+  - 'mocha_istanbul'

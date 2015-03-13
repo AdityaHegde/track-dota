@@ -1,26 +1,38 @@
 var 
 mongoose = require("mongoose"),
+Team = require("./team"),
+Player = require("./player"),
+League = require("./league"),
 gameSchema = mongoose.Schema({
-  lobby_id : String,
-  match_id : String,
-  duration : Number,
-  fullData : mongoose.Schema.Types.Mixed,
+  match_id       : String,
+  league         : {
+    type : mongoose.Schema.Types.ObjectId,
+    ref  : League,
+  },
+  league_tier    : Number,
+  server_version : Number,
+
+  radiant        : {
+    type : mongoose.Schema.Types.ObjectId,
+    ref  : Team,
+  },
+  dire           : {
+    type : mongoose.Schema.Types.ObjectId,
+    ref  : Team,
+  },
+  players        : [{
+    type : mongoose.Schema.Types.ObjectId,
+    ref  : Player,
+  }],
+  winning_side   : Number,
+
+  radiant_series_wins : Number,
+  dire_series_wins    : Number,
+  series_type         : Number,
 }),
 game = mongoose.model('Game', gameSchema);
 
 game.searchAttr = ["match_id"];
-game.queryParam = ["match_id", "duration"];
-game.apiFeed = {
-  host : "api.steampowered.com",
-  path : "/IDOTA2Match_570/GetLiveLeagueGames/v001?key=<apiKey>",
-  resultBase : "result.games",
-  resultKeysToData : {
-    lobby_id : "lobby_id",
-    match_id : "match_id",
-    duration : "scoreboard.duration",
-    fullData : "",
-  },
-  isStatic : false,
-};
+game.queryParam = ["match_id"];
 
 module.exports = game;

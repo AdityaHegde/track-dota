@@ -1,8 +1,9 @@
 var 
 mongoose = require("mongoose"),
 playerSchema = mongoose.Schema({
-  steamid      : String,
-  personaname  : String,
+  account_id   : Number,
+  name         : String,
+  current_team : Number,
   avatar       : String,
 }),
 player = mongoose.model('Player', playerSchema);
@@ -14,9 +15,9 @@ player.apiFeed = {
   path : "/isplayeruser/getplayersummaries/v0002/?key=<apiKey>&splayerids=<playerIds>",
   resultBase : "response.players",
   resultKeysToData : {
-    steamid      : "steamid",
-    personaname  : "personaname",
-    avatar       : "avatar",
+    account_id : "steamid",
+    name       : "personaname",
+    avatar     : "avatar",
   },
   isStatic : true,
 };

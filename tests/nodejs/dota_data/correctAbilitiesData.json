@@ -1,0 +1,205 @@
+{
+  "result": {
+    "games": [
+      {
+        "match_id": 1,
+        "league_id": 1,
+        "scoreboard": {
+          "duration": 0,
+          "radiant": {
+            "score": 0,
+            "tower_state": 2047,
+            "barracks_state": 63,
+            "players": [
+              {
+                "player_slot": 1,
+                "hero_id": 1
+              },
+              {
+                "player_slot": 2,
+                "hero_id": 2
+              },
+              {
+                "player_slot": 3,
+                "hero_id": 3
+              },
+              {
+                "player_slot": 4,
+                "hero_id": 4
+              },
+              {
+                "player_slot": 5,
+                "hero_id": 5
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 1,
+                "ability_level" : 1
+              },
+              {
+                "ability_id" : 10,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 1,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 1,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 40,
+                "ability_level" : 1
+              }
+            ]
+          },
+          "dire": {
+            "score": 0,
+            "tower_state": 2047,
+            "barracks_state": 63,
+            "players": [
+              {
+                "player_slot": 1,
+                "hero_id": 6
+              },
+              {
+                "player_slot": 2,
+                "hero_id": 7
+              },
+              {
+                "player_slot": 3,
+                "hero_id": 8
+              },
+              {
+                "player_slot": 4,
+                "hero_id": 9
+              },
+              {
+                "player_slot": 5,
+                "hero_id": 10
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 60,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 1,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 90,
+                "ability_level" : 1
+              }
+            ]
+          }
+        }
+      },
+      {
+        "match_id": 2,
+        "league_id": 1,
+        "scoreboard": {
+          "duration": 0,
+          "radiant": {
+            "score": 0,
+            "tower_state": 2047,
+            "barracks_state": 63,
+            "players": [
+              {
+                "player_slot": 1,
+                "hero_id": 1
+              },
+              {
+                "player_slot": 2,
+                "hero_id": 2
+              },
+              {
+                "player_slot": 3,
+                "hero_id": 3
+              },
+              {
+                "player_slot": 4,
+                "hero_id": 4
+              },
+              {
+                "player_slot": 5,
+                "hero_id": 5
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 10,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 1,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 30,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 1,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 50,
+                "ability_level" : 1
+              }
+            ]
+          },
+          "dire": {
+            "score": 0,
+            "tower_state": 2047,
+            "barracks_state": 63,
+            "players": [
+              {
+                "player_slot": 1,
+                "hero_id": 6
+              },
+              {
+                "player_slot": 2,
+                "hero_id": 7
+              },
+              {
+                "player_slot": 3,
+                "hero_id": 8
+              },
+              {
+                "player_slot": 4,
+                "hero_id": 9
+              },
+              {
+                "player_slot": 5,
+                "hero_id": 10
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "status": 200
+  }
+}

@@ -5,7 +5,7 @@ define([
 
 Dota.GameMapView = Ember.View.extend({
   template : Ember.Handlebars.compile('' +
-    '{{#each view.gameSnapshot.scoreboard.radiant.players}}' +
+    /*'{{#each view.gameSnapshot.scoreboard.radiant.players}}' +
       '<div class="player player-radiant" {{bind-attr style="playerPosStyle"}}>' +
         '<img {{bind-attr class=":hero-minimap-icon :d2mh heroObj.hero_name"}} {{action "playerSelected" this}}/>' +
       '</div>' +
@@ -15,7 +15,15 @@ Dota.GameMapView = Ember.View.extend({
         '<img {{bind-attr class=":hero-minimap-icon :d2mh heroObj.hero_name"}} {{action "playerSelected" this}}/>' +
       '</div>' +
     '{{/each}}' +
-    '<div class="clearfix"></div>' +
+    '<div class="clearfix"></div>' +*/
+    '{{#each grid}}' +
+      '<div class="grid-row">' +
+        '{{#each this}}' +
+          '<div class="grid-cell">' +
+          '</div>' +
+        '{{/each}}' +
+      '</div>' +
+    '{{/each}}'
   ''),
   gameSnapshot : null,
 

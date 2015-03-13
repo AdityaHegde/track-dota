@@ -6,6 +6,7 @@ teamSchema = mongoose.Schema({
   team_tag     : String,
   time_created : Number,
   logo         : Number,
+  //logo_imgae   : String,
   logo_sponsor : Number,
   country_code : String,
 }),
@@ -26,6 +27,15 @@ team.apiFeed = {
     logo_sponsor : "logo_sponsor",
     country_code : "country_code",
   },
+  /*processKeysOnRecord : {
+    logo_imgae : {
+      type   : "getDataCreateIfNotPresent",
+      getKey : "",
+      model  : "teamLogo",
+      key    : "url",
+      params : ["logo"],
+    },
+  },*/
   isStatic : true,
 };
 

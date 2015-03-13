@@ -6,6 +6,7 @@ define([
 ], function(Ember, Dota, Utils) {
 
 var
+teamKey = ["radiant", "dire"],
 PlayerObject = Ember.Object.extend({
   player_slot : 0,
   hero_id     : 0,
@@ -17,7 +18,7 @@ PlayerObject = Ember.Object.extend({
     gameSnapshot = this.get("parentObj.parentObj.parentObj");
     if(gameSnapshot) {
       var players = gameSnapshot.get("scoreboard." + teamKey[team] + ".players");
-      if(teamActual) {
+      if(players) {
         return players.findBy("hero_id", hero_id);
       }
     }
@@ -31,9 +32,10 @@ PlayerObject = Ember.Object.extend({
     itemObjs = [];
     if(items) {
       for(var i in items) {
-        itemObjs.pushObject(CrudAdapter.GlobalData.items.findBy("item_id", items[i]));
+        itemObjs.pushObject(CrudAdapter.GlobalData.items.findBy("item_id", Number(items[i])));
       }
     }
+    return itemObjs;
   }.property("items.@each"),
 }),
 DataObject = Ember.Object.extend({
@@ -44,5 +46,11 @@ Dota.ItemPickupObject = Dota.FeedObject.extend({
 
   data : Utils.belongsTo(DataObject),
 });
+
+
+return {
+  itemPickup : Dota.ItemPickupObject,
+};
+
 
 });

@@ -3,6 +3,7 @@ define([
   "../app",
   "ember-utils-core",
   "./dota-objects",
+  "./feeds/main",
 ], function(Ember, Dota, Utils) {
 
 
@@ -11,6 +12,8 @@ Dota.GameSizeData = {
   MAP_SIZE_Y    : 16000,
   PLAYER_SIZE_X : 32,
   PLAYER_SIZE_Y : 32,
+  GRID_SIZE_X   : 800,
+  GRID_SIZE_Y   : 800,
   imageSizeX : 600,
   imageSizeY : 600,
 };

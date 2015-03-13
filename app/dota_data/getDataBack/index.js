@@ -7,7 +7,6 @@ deepKeys = require("deep-keys-lib"),
 mongodbAPI = require("../../lib/mongodbAPI"),
 extractEvents = require("./extractEvents"),
 readFromFile = require("./readFromFile"),
-correctAbilities = require("./correctAbilities"),
 models = {
   game     : require("../../models/gameSnapshot"),
   hero     : require("../../models/hero"),
@@ -30,15 +29,18 @@ var methods = {
     tracker = new PromiseTracker(),
     dataArr = [];
 
-    methods.getDataFromAPI(model, params, meta, tracker).then(function(data) {
+    methods.getDataFromAPI(model, params, meta, tracker, 0).then(function(data) {
       data = deepKeys.getValue(data, model.apiFeed.resultBase) || [];
       if(data && !data.length) {
         data = [data];
       }
-      //correctAbilities(meta.rawResult, data, meta);
+      methods.correctAbilities(meta.rawResult, data, meta);
       for(var i = 0; i < data.length; i++) {
-        tracker.addAsyncNonBlocking(function(obj, idx) {
-          var rec = {};
+        (function() {
+          var
+          obj = data[i],
+          rec = {},
+          idx = i;
           if(model.apiFeed.useFullResult) {
             rec = obj;
           }
@@ -47,7 +49,7 @@ var methods = {
               deepKeys.assignValue(rec, k, deepKeys.getValue(obj, model.apiFeed.resultKeysToData[k]));
             }
           }
-          return new Promise(function(resolve, reject) {
+          new Promise(function(resolve, reject) {
             //console.log("in promise ** " + idx);
             var
             tr = new PromiseTracker();
@@ -58,7 +60,7 @@ var methods = {
                 v = deepKeys.getValue(rec, model.apiFeed.processKeysOnRecord[_k].getKey);
                 if(model.apiFeed.processKeysOnRecord[_k].canBeNull || (v !== null && v !== undefined)) {
                   //console.log("1 ** " + idx);
-                  tr.addAsyncNonBlocking(methods[model.apiFeed.processKeysOnRecord[_k].type], v, model.apiFeed.processKeysOnRecord[_k], params, meta, tr).then(function(prec) {
+                  methods[model.apiFeed.processKeysOnRecord[_k].type](v, model.apiFeed.processKeysOnRecord[_k], params, meta, tr, 1).then(function(prec) {
                     if(prec) {
                       var
                       replacedKey = deepKeys.replaceKeys(model.apiFeed.processKeysOnRecord[_k].key, prec),
@@ -70,11 +72,13 @@ var methods = {
                     else {
                       console.log(rec);
                     }
+                  }, function(err) {
+                    console.log(err);
                   });
                 }
               })();
             }
-            tr.andThen(function() {
+            new Promise(function(resolve, reject) {
               if(model.apiFeed.incrementalBy) {
                 if(!meta.incrementalMeta) {
                   meta.incrementalMeta = {};
@@ -117,21 +121,23 @@ var methods = {
               else {
                 resolve();
               }
-            });
-            tr.onError(function(err) {
-              reject(err);
-            });
-          });
-        }, data[i], i, tracker);
+            }, tr, 0);
+            new Promise(function(rs, rj) {
+              rs();
+              resolve();
+            }, tr, 0);
+          }, tracker, 1);
+        })();
       }
-      tracker.andThen(function() {
+      new Promise(function(resolve, reject) {
         //console.log("Call end");
         callback(null, dataArr);
-      });
+        resolve();
+      }, tracker, 0);
     });
   },
 
-  getDataCreateIfNotPresent : function(rec, config, params, meta) {
+  getDataCreateIfNotPresent : function(rec, config, params, meta, tracker, type) {
     return new Promise(function(resolve, reject) {
       mongodbAPI.get(config.model, rec, function(err, r) {
         if(err) {
@@ -152,10 +158,10 @@ var methods = {
           resolve(r);
         }
       });
-    });
+    }, tracker, type);
   },
 
-  getDataFromAPI : function(model, params, meta) {
+  getDataFromAPI : function(model, params, meta, tracker, type) {
     return new Promise(function(resolve, reject) {
       var
       host = deepKeys.replaceKeys(model.apiFeed.host, params),
@@ -179,10 +185,10 @@ var methods = {
           }
         });
       }).end();
-    });
+    }, tracker, type);
   },
 
-  getDataFromAPIWrapper : function(rec, config, params, meta) {
+  getDataFromAPIWrapper : function(rec, config, params, meta, tracker, type) {
     var p = {
       apiKey : params.apiKey,
     };
@@ -192,10 +198,10 @@ var methods = {
         rec    : rec,
       }, k));
     }
-    return getDataFromAPI(config.model, params, meta);
+    return getDataFromAPI(config.model, params, meta, tracker, type);
   },
 
-  createOrUpdateRec : function(modelName, rec) {
+  createOrUpdateRec : function(modelName, rec, tracker, type) {
     return new Promise(function(resolve, reject) {
       //console.log("create/update");
       mongodbAPI.create_or_update(modelName, rec, function(err, rec) {
@@ -206,13 +212,15 @@ var methods = {
           resolve(rec);
         }
       });
-    });
+    }, tracker, type);
   },
 
-  extractEvents : function(rec, config, params, meta) {
+  extractEvents : function(rec, config, params, meta, tracker, type) {
     return new Promise(function(resolve, reject) {
       if(!rec || !meta.incrementalMeta || !meta.incrementalMeta[rec.match_id]) {
-        resolve([]);
+        setTimeout(function() {
+          resolve([]);
+        }, 10);
       }
       else {
         var
@@ -221,15 +229,58 @@ var methods = {
           resolve(events);
         });
       }
-    });
+    }, tracker, type);
   },
 
-  readFromFile : function(rec, config, params, meta) {
+  readFromFile : function(rec, config, params, meta, tracker, type) {
     return new Promise(function(resolve, reject) {
       readFromFile(config, rec).then(function(val) {
         resolve(val);
       });
-    });
+    }, tracker, type);
+  },
+
+  correctAbilities : function(rawData, data, meta) {
+    var
+    abilities = rawData.match(/"abilities"\s*:\s*(\[(?:.|\n)*?\])/g),
+    abilitiesObjMap = {},
+    abilitiesObjs = [];
+    if(abilities) {
+      for(var i = 0; i < abilities.length; i++) {
+        var
+        abilArr = abilities[i].replace(/"abilities"\s*:\s*/ ,""),
+        abilArrKey = JSON.stringify(JSON.parse(abilArr));
+        abilitiesObjMap[abilArrKey] = i;
+        abilitiesObjs.push(abilArr);
+      }
+      var lastPlayerBlock = 0;
+      for(var i = 0; i < data.length; i++) {
+        if(data[i].scoreboard) {
+          for(var t = 0; t < teams.length; t++) {
+            if(data[i].scoreboard[teams[t]] && data[i].scoreboard[teams[t]].abilities) {
+              var
+              abilArrKey = JSON.stringify(data[i].scoreboard[teams[t]].abilities);
+              abilArrIdx = abilitiesObjMap[abilArrKey];
+              for(var j = lastPlayerBlock, k = 0; j <= abilArrIdx; ) {
+                var hero_id = data[i].scoreboard[teams[t]].players[k].hero_id;
+                for(var a = 0; a < abilitiesObjs[j].length; a++) {
+                  if(meta.abilitiesMap[abilitiesObjs[j].ability_id].hero_id === hero_id) {
+                    data[i].scoreboard[teams[t]].players[k].abilities = abilitiesObjs[j];
+                    console.log("added abilities ! " + teams[t] + " : " + k + " : " + i);
+                    j++;
+                    break;
+                  }
+                }
+                k++;
+              }
+              delete data[i].scoreboard[teams[t]].abilities;
+              lastPlayerBlock = abilArrIdx + 1;
+              console.log("corrected ! " + teams[t] + " : " + abilArrIdx);
+            }
+          }
+        }
+      }
+    }
   },
 };
 

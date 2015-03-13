@@ -11,51 +11,50 @@ readFromFile = function(config, baseRec) {
     var
     t = new PromiseTracker(),
     fileMap;
-    new Promise(function(resolve, reject) {
-      if(registry[config.fileName]) {
-        console.log("found!");
-        fileMap = registry[config.fileName];
-        setTimeout(function() {
+    t.addAsyncBlocking(function() {
+      return new Promise(function(resolve, reject) {
+        if(registry[config.fileName]) {
+          //console.log("found!");
+          fileMap = registry[config.fileName];
           resolve();
-        }, 10);
-      }
-      else {
-        fs.readFile(config.fileName, "utf8", function(err, data) {
-          if(err) {
-            reject(err);
-          }
-          else {
-            var
-            rows = data.split(config.rowsRegex),
-            rowRecs = [],
-            rowsMap = {};
-            if(rows) {
-              for(var i in rows) {
-                var
-                parts = rows[i].match(config.partsRegex),
-                rowRec = {};
-                for(var j in config.partsKeys) {
-                  deepKeys.assignValue(rowRec, config.partsKeys[j], parts[j]);
-                }
-                if(parts) {
-                  rowsMap[parts[config.mapValIdx]] = rowRec;
+        }
+        else {
+          fs.readFile(config.fileName, "utf8", function(err, data) {
+            if(err) {
+              reject(err);
+            }
+            else {
+              var
+              rows = data.split(config.rowsRegex),
+              rowRecs = [],
+              rowsMap = {};
+              if(rows) {
+                for(var i in rows) {
+                  var
+                  parts = rows[i].match(config.partsRegex),
+                  rowRec = {};
+                  for(var j in config.partsKeys) {
+                    deepKeys.assignValue(rowRec, config.partsKeys[j], parts[j]);
+                  }
+                  if(parts) {
+                    rowsMap[parts[config.mapValIdx]] = rowRec;
+                  }
                 }
               }
+              registry[config.fileName] = rowsMap;
+              fileMap = rowsMap;
+              resolve();
             }
-            registry[config.fileName] = rowsMap;
-            fileMap = rowsMap;
-            resolve();
-          }
-        });
-      }
-    }, t, 0);
-    new Promise(function(resolve, reject) {
+          });
+        }
+      });
+    });
+    t.andThen(function() {
       var
       sv = deepKeys.getValue(baseRec, config.searchValueKey),
       sr = fileMap[sv];
-      resolve();
       resolveMain(sr);
-    }, t, 0);
+    });
   });
 };
 

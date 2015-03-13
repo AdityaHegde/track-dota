@@ -9,4 +9,8 @@ Dota.FeedObject = Ember.Object.extend({
   type     : "",
 });
 
+return {
+  feed : Dota.FeedObject,
+};
+
 });

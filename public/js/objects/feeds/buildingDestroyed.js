@@ -20,4 +20,10 @@ Dota.BuildingDestroyedObject = Dota.FeedObject.extend({
   data : Utils.belongsTo(DataObject),
 });
 
+
+return {
+  buildingDestroyed : Dota.BuildingDestroyedObject,
+};
+
+
 });

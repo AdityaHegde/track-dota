@@ -77,3 +77,10 @@ body:before {
 .hero-minimap-icon {
   padding: 15px;
 }
+
+.grid-row {
+  display: inline-block;
+}
+.grid-cell {
+  display: inline-block;
+}
