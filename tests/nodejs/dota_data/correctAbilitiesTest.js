@@ -100,54 +100,54 @@ resultPlayers = [{
   radiant : [{
     "player_slot": 1,
     "hero_id": 1,
-    "abilities" : [{
-      "ability_id" : 10,
-      "ability_level" : 1
-    }],
   }, {
     "player_slot": 2,
     "hero_id": 2,
-    "abilities" : [{
-      "ability_id" : 1,
-      "ability_level" : 1
-    }],
   }, {
     "player_slot": 3,
     "hero_id": 3,
-    "abilities" : [{
-      "ability_id" : 30,
-      "ability_level" : 1
-    }],
   }, {
     "player_slot": 4,
     "hero_id": 4,
-    "abilities" : [{
-      "ability_id" : 1,
-      "ability_level" : 1
-    }],
   }, {
     "player_slot": 5,
     "hero_id": 5,
-    "abilities" : [{
-      "ability_id" : 50,
-      "ability_level" : 1
-    }],
   }],
   dire : [{
     "player_slot": 1,
     "hero_id": 6,
+    "abilities" : [{
+      "ability_id" : 1,
+      "ability_level" : 1
+    }],
   }, {
     "player_slot": 2,
     "hero_id": 7,
+    "abilities" : [{
+      "ability_id" : 70,
+      "ability_level" : 1
+    }],
   }, {
     "player_slot": 3,
     "hero_id": 8,
+    "abilities" : [{
+      "ability_id" : 1,
+      "ability_level" : 1
+    }],
   }, {
     "player_slot": 4,
     "hero_id": 9,
+    "abilities" : [{
+      "ability_id" : 90,
+      "ability_level" : 1
+    }],
   }, {
     "player_slot": 5,
     "hero_id": 10,
+    "abilities" : [{
+      "ability_id" : 1,
+      "ability_level" : 1
+    }],
   }],
 }];
 
@@ -158,10 +158,7 @@ describe("correctAbilities", function() {
       else {
         try {
           var
-          games = JSON.parse(data).result.games,
-          game = games[0],
-          radiantPlayers = game.scoreboard.radiant.players,
-          direPlayers = game.scoreboard.dire.players;
+          games = JSON.parse(data).result.games;
           correctAbilities(data, games, ablitiesMap);
 
           for(var i = 0; i < resultPlayers.length; i++) {
@@ -174,6 +171,7 @@ describe("correctAbilities", function() {
 
           done();
         } catch(err) {
+          console.log(err);
           done(err);
         }
       }

@@ -1,15 +1,9 @@
 var 
 mongoose = require("mongoose"),
 abilitySchema = mongoose.Schema({
-  ability_id   : Number,
-  ability_name : String,
-  /*img          : String,
-  desc         : String,
-
-  isUlti       : Boolean,
-  isPassive    : Boolean,
-
-  cooldowns    : [String],*/
+  ability_id        : Number,
+  ability_name      : String,
+  ability_hero_name : String,
   //http://media.steampowered.com/apps/dota2/images/abilities/<hero name>_<ability name>_hp1.png
 }),
 ability = mongoose.model('Ability', abilitySchema);
@@ -23,6 +17,19 @@ ability.apiFeed = {
   resultKeysToData : {
     ability_id   : "id",
     ability_name : "name",
+  },
+  processKeysOnRecord : {
+    ability_hero_name : {
+      type       : "getDataFromAPIWrapper",
+      getKey     : "",
+      key        : "abilitydata.<ability_name>.hurl",
+      apiParams  : {
+        host : "www.dota2.com",
+        path : "/jsfeed/abilitydata",
+        callType : "http",
+      },
+      params     : ["ability_name"],
+    },
   },
   isStatic : true,
 };

@@ -1,22 +1,25 @@
 var
-https = require("https"),
-mongoose = require("mongoose"),
-Promise = require("promise2").Promise,
+https          = require("https"),
+mongoose       = require("mongoose"),
+Promise        = require("promise2").Promise,
 PromiseTracker = require("promise2").PromiseTracker,
-deepKeys = require("deep-keys-lib"),
-mongodbAPI = require("../../lib/mongodbAPI"),
-extractEvents = require("./extractEvents"),
-readFromFile = require("./readFromFile"),
+deepKeys       = require("deep-keys-lib"),
+
+mongodbAPI     = require("../../lib/mongodbAPI"),
+
+extractEvents    = require("./extractEvents"),
+readFromFile     = require("./readFromFile"),
 correctAbilities = require("./correctAbilities"),
+getDataFromAPI   = require("./getDataFromAPI"),
+
 models = {
-  game     : require("../../models/gameSnapshot"),
-  hero     : require("../../models/hero"),
-  ability  : require("../../models/ability"),
-  item     : require("../../models/item"),
-  league   : require("../../models/league"),
-  team     : require("../../models/team"),
-  teamLogo : require("../../models/teamLogo"),
-  player   : require("../../models/player"),
+  game    : require("../../models/gameSnapshot"),
+  hero    : require("../../models/hero"),
+  ability : require("../../models/ability"),
+  item    : require("../../models/item"),
+  league  : require("../../models/league"),
+  team    : require("../../models/team"),
+  player  : require("../../models/player"),
 },
 teams = ["radiant", "dire"];
 
@@ -30,12 +33,15 @@ var methods = {
     tracker = new PromiseTracker(),
     dataArr = [];
 
-    methods.getDataFromAPI(model, params, meta, tracker).then(function(data) {
+    getDataFromAPI(model.apiFeed, params, meta).then(function(data) {
       data = deepKeys.getValue(data, model.apiFeed.resultBase) || [];
       if(data && !data.length) {
         data = [data];
       }
-      //correctAbilities(meta.rawResult, data, meta);
+      if(modelName === "game") {
+        //temporary fix for abilities returned at the wrong place
+        //correctAbilities(meta.rawResult, data, meta.abilitiesMap);
+      }
       for(var i = 0; i < data.length; i++) {
         tracker.addAsyncNonBlocking(function(obj, idx) {
           var rec = {};
@@ -46,6 +52,11 @@ var methods = {
             for(var k in model.apiFeed.resultKeysToData) {
               deepKeys.assignValue(rec, k, deepKeys.getValue(obj, model.apiFeed.resultKeysToData[k]));
             }
+            //console.log(rec);
+          }
+          if(modelName === "game") {
+            console.log("duration");
+            console.log(rec.scoreboard.duration);
           }
           return new Promise(function(resolve, reject) {
             //console.log("in promise ** " + idx);
@@ -61,19 +72,21 @@ var methods = {
                   tr.addAsyncNonBlocking(methods[model.apiFeed.processKeysOnRecord[_k].type], v, model.apiFeed.processKeysOnRecord[_k], params, meta, tr).then(function(prec) {
                     if(prec) {
                       var
-                      replacedKey = deepKeys.replaceKeys(model.apiFeed.processKeysOnRecord[_k].key, prec),
+                      replacedKey = deepKeys.replaceKeys(model.apiFeed.processKeysOnRecord[_k].key, rec),
                       _kv = deepKeys.getValue(prec, replacedKey);
                       //console.log("2 ** " + idx + " ** " + _kv);
                       deepKeys.assignValue(rec, _k, _kv);
                       //console.log(rec[_k]);
                     }
                     else {
-                      console.log(rec);
+                      console.log("Error : No Prec");
+                      //console.log(rec);
                     }
                   });
                 }
               })();
             }
+            tr.wait();
             tr.andThen(function() {
               if(model.apiFeed.incrementalBy) {
                 if(!meta.incrementalMeta) {
@@ -124,9 +137,15 @@ var methods = {
           });
         }, data[i], i, tracker);
       }
+
       tracker.andThen(function() {
         //console.log("Call end");
         callback(null, dataArr);
+      });
+
+      tracker.onError(function(err) {
+        console.log(err.stack);
+        callback(err);
       });
     });
   },
@@ -155,33 +174,6 @@ var methods = {
     });
   },
 
-  getDataFromAPI : function(model, params, meta) {
-    return new Promise(function(resolve, reject) {
-      var
-      host = deepKeys.replaceKeys(model.apiFeed.host, params),
-      path = deepKeys.replaceKeys(model.apiFeed.path, params);
-      console.log("call made " + host + path);
-      https.request({
-        host : host,
-        path : path,
-      }, function(res) {
-        var str = "";
-        res.on("data", function(chunk) {
-          str += chunk;
-        });
-        res.on("end", function() {
-          try {
-            var data = JSON.parse(str);
-            meta.rawResult = str;
-            resolve(data);
-          } catch(e) {
-            reject(e);
-          }
-        });
-      }).end();
-    });
-  },
-
   getDataFromAPIWrapper : function(rec, config, params, meta) {
     var p = {
       apiKey : params.apiKey,
@@ -190,9 +182,9 @@ var methods = {
       deepKeys.assignValue(p, k, deepKeys.getValue({
         params : params,
         rec    : rec,
-      }, k));
+      }, config.paramToApi[k]));
     }
-    return getDataFromAPI(config.model, params, meta);
+    return getDataFromAPI(config.apiParams, p, meta);
   },
 
   createOrUpdateRec : function(modelName, rec) {

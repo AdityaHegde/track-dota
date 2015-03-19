@@ -5,9 +5,9 @@ teamSchema = mongoose.Schema({
   team_name    : String,
   team_tag     : String,
   time_created : Number,
-  logo         : Number,
+  logo         : String,
   //logo_imgae   : String,
-  logo_sponsor : Number,
+  logo_sponsor : String,
   country_code : String,
 }),
 team = mongoose.model('Team', teamSchema);
@@ -27,15 +27,20 @@ team.apiFeed = {
     logo_sponsor : "logo_sponsor",
     country_code : "country_code",
   },
-  /*processKeysOnRecord : {
+  processKeysOnRecord : {
     logo_imgae : {
-      type   : "getDataCreateIfNotPresent",
-      getKey : "",
-      model  : "teamLogo",
-      key    : "url",
-      params : ["logo"],
+      type       : "getDataFromAPIWrapper",
+      getKey     : "",
+      key        : "url",
+      apiParams  : {
+        host : "api.steampowered.com",
+        path : "/ISteamRemoteStorage/GetUGCFileDetails/v1/?key=<apiKey>&appid=570&ugcid=<logo>"
+      },
+      paramToApi : {
+        "logo" : "rec.logo"
+      },
     },
-  },*/
+  },
   isStatic : true,
 };
 

@@ -7,7 +7,7 @@ getTeamAndPlayerInfo = require("./getTeamAndPlayerInfo"),
 config = require("../config/config");
 
 module.exports = {
-  getData       : getData,
+  getData       : getData.getData,
   getDataByGame : getDataByGame,
   getStaticData : getStaticData,
 

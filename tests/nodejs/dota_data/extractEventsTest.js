@@ -1,17 +1,11 @@
 var
 proxyquire = require("proxyquire").noCallThru(),
-modelProxy = {
-  create : function(data, callback) {
-    setTimeout(function() {
-      callback(null, data);
-    }, 50);
-  },
-},
+modelProxy = require("./lib/modelProxy"),
 extractEvents = proxyquire("../../../app/dota_data/getData/extractEvents", {
-  "../../models/events/itemPickup"        : modelProxy,
-  "../../models/events/kda"               : modelProxy,
-  "../../models/events/buildingDestroyed" : modelProxy,
-  "../../models/events/abilitySkilled"    : modelProxy,
+  "../../models/events/itemPickup"        : new modelProxy(),
+  "../../models/events/kda"               : new modelProxy(),
+  "../../models/events/buildingDestroyed" : new modelProxy(),
+  "../../models/events/abilitySkilled"    : new modelProxy(),
 }),
 readFile = require("fs").readFile,
 assert = require("assert"),

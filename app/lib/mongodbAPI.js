@@ -27,11 +27,10 @@ function formQuery(model, param, type) {
 }
 
 exports.create = function(modelName, jsonData, callback) {
-  var model = modelMap[modelName],
-      obj = new model(jsonData);
+  var model = modelMap[modelName];
   //console.log("Create "+modelName);
   //console.log(jsonData);
-  obj.save(function(err, obj) {
+  model.create(jsonData, function(err, obj) {
     if(err) {
       callback(err);
     }
@@ -115,8 +114,7 @@ exports.create_or_update = function(modelName, param, callback) {
       });
     }
     else {
-      obj.set(param);
-      obj.save(function(err, obj) {
+      model.update(param, function(err, obj) {
         callback(err, obj);
       });
     }

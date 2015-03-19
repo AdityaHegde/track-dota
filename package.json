@@ -61,7 +61,8 @@
     "mocha": "*",
     "istanbul": "*",
     "promise2" : "*",
-    "proxyquire": "*"
+    "proxyquire": "*",
+    "node-mocks-http": "*"
   },
   "scripts": {
     "test" : "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha -- --check-leaks -t 60000 tests/nodejs/*/*Test.js"

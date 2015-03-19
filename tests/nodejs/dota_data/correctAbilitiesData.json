@@ -138,36 +138,6 @@
                 "player_slot": 5,
                 "hero_id": 5
               }
-            ],
-            "abilities" : [
-              {
-                "ability_id" : 10,
-                "ability_level" : 1
-              }
-            ],
-            "abilities" : [
-              {
-                "ability_id" : 1,
-                "ability_level" : 1
-              }
-            ],
-            "abilities" : [
-              {
-                "ability_id" : 30,
-                "ability_level" : 1
-              }
-            ],
-            "abilities" : [
-              {
-                "ability_id" : 1,
-                "ability_level" : 1
-              }
-            ],
-            "abilities" : [
-              {
-                "ability_id" : 50,
-                "ability_level" : 1
-              }
             ]
           },
           "dire": {
@@ -194,6 +164,36 @@
               {
                 "player_slot": 5,
                 "hero_id": 10
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 1,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 70,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 1,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 90,
+                "ability_level" : 1
+              }
+            ],
+            "abilities" : [
+              {
+                "ability_id" : 1,
+                "ability_level" : 1
               }
             ]
           }
